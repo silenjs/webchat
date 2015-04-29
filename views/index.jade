@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  script(type='text/javascript',src='/socket.io/socket.io.js')
+  <input type='text' id='chatInput'>
+  <input type='button' value='chat' id='chatBtn'>
+  <ul id='userList'>userList</ul>
+  <ul id='chatList'>chatList</ul>
+  <script type='text/javascript' src="javascripts/jquery.js"></script>
+  <script type='text/javascript' src="javascripts/main.js"></script>
