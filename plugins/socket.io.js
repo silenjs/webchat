@@ -4,7 +4,6 @@ usrapi.sAction();
 function Socketio(){
   var visitorOrder=1,socketArr=[];
   return function(io){
-    io.checkRequest();
     io.sockets.on('connection',function(socket){
       /*  
       客户端登陆 
