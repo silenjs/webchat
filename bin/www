@@ -4,10 +4,10 @@
  * Module dependencies.
  */
 
-// var app = require('../app/app');
 var app = require('../app');
 var debug = require('debug')('chat:server');
 var http = require('http');
+var url = require('url');
 var socketio = require('../plugins/socket.io');
 
 
@@ -24,7 +24,15 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
-var io = require('socket.io').listen(server);
+var io = require('socket.io').listen(server,{origins:function(origin,fn){
+  if (origin) {
+    try {
+      var parts = url.parse(origin);
+      var ok = ~parts.hostname.indexOf('.kankan.com');
+      return fn(null, !!ok);
+    } catch (ex) {}
+  }
+}});
 socketio(io);
 
 /**
