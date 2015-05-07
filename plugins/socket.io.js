@@ -53,13 +53,13 @@ function Socketio(){
                 filterFlag = comment.filter(content.replace(/\s*/g,''));
               }
             //存mongodb
-            comment.insert({unickname:socket.name,comment:content,filter:filterFlag?1:0,refer:socket.refer,fip:socket.conn.remoteAddress,insert_time:new Date().getTime()},function(){});
+            comment.save({unickname:socket.name,comment:content,filter:filterFlag?1:0,refer:socket.refer,fip:socket.conn.remoteAddress,insert_time:new Date().getTime()},function(){});
             if(filterFlag){
               socket.send({unickname:socket.name,comment:content});
             }else{
               //广播
               io.sockets.send({unickname:socket.name,comment:content});
-              //socket.broadcast.send({unickname:socket.name,comment:content})
+              // socket.broadcast.send({unickname:socket.name,comment:content})
             }
           }else{
 

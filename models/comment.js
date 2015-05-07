@@ -17,7 +17,8 @@ var filter = mongodb.mongoose.model('filter_words',filterSchema);
 var filterArr = [];
 filter.find({option:{$gt:1}},function(err,filters){
     filters.forEach(function(obj){
-        filterArr.push(obj.keyword);
+        var kw = obj.keyword.replace('/\s*/g','');
+        kw&&filterArr.push(kw);
     })
 })
 var Commentd = function(){}
@@ -26,14 +27,9 @@ Commentd.prototype.save = function(obj,callback){
     instance.save();
 }
 Commentd.prototype.filter = function(content){
-    if(filterArr.length){
-        for(var i=0,len=filterArr.length;i<len;i++){
-            var filterWord = filterArr[i].replace('/\s*/g','');
-            if(filterWord&&(content.indexOf(filterWord)+1)){
-                return true;   
-            }
-        }
-    }
-    return false;
+    return filterArr.some(function(kw){
+        kw = kw.replace('/\s*/g','');
+        return !!~content.indexOf(kw);
+    })
 }
 module.exports = new Commentd();
