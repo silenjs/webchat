@@ -27,9 +27,7 @@ var server = http.createServer(app);
 var io = require('socket.io').listen(server,{origins:function(origin,fn){
   if (origin) {
     try {
-      var parts = url.parse(origin);
-      var ok = ~parts.hostname.indexOf('.kankan.com');
-      return fn(null, !!ok);
+      return fn(null, !!~url.parse(origin).hostname.indexOf('.kankan.com'));
     } catch (ex) {}
   }
 }});

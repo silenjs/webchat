@@ -1,16 +1,23 @@
 var comment = require('../models/comment');
 var usrapi = require('./socket.net');
+var uidFlag = 'KANKANWEBUID';
 usrapi.sAction();
 function Socketio(){
   var visitorOrder=1,socketArr=[];
   return function(io){
     io.sockets.on('connection',function(socket){
+      var sname = socket.conn.request.headers.cookie?socket.conn.request.headers.cookie.split(';').filter(function(icookie){
+        return !!~icookie.indexOf(uidFlag)
+      }):[];
+      socket.name = sname.length?sname[0].split('=')[1]:'visitor'+visitorOrder++;
+      socket.refer = socket.conn.request.headers.referer;
+      console.log(socket.refer)
+      console.log(socket.conn.remoteAddress);
       /*  
       客户端登陆 
       data {unickname}
       */
       socket.on('signin',function(data){
-        socket.name=data.unickname||'visitor'+visitorOrder++;
         socketArr.push(socket.name);  
         io.sockets.emit('signinback',{unickname:socket.name});    
       });
@@ -31,7 +38,7 @@ function Socketio(){
           if(index+1){
             socketArr.splice(index,1)
           } 
-          io.sockets.send({unickname:socket.name,comment:socket.name+'下线了！'})      
+          // io.sockets.send({unickname:socket.name,comment:socket.name+'下线了！'})      
        })
       /*
       客户端发送消息
@@ -46,7 +53,7 @@ function Socketio(){
                 filterFlag = comment.filter(content.replace(/\s*/g,''));
               }
             //存mongodb
-            comment.save({unickname:socket.name,comment:content,filter:filterFlag?1:0},function(){});
+            comment.insert({unickname:socket.name,comment:content,filter:filterFlag?1:0,refer:socket.refer,fip:socket.conn.remoteAddress,insert_time:new Date().getTime()},function(){});
             if(filterFlag){
               socket.send({unickname:socket.name,comment:content});
             }else{
